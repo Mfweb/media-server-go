@@ -2,6 +2,8 @@ package mediaserver
 
 import "C"
 import (
+	"fmt"
+	"unsafe"
 	native "github.com/notedit/media-server-go/wrapper"
 )
 
@@ -34,20 +36,20 @@ type overwrittenMediaFrameListener struct {
 
 func (p *overwrittenMediaFrameListener) OnMediaFrame(frame native.MediaFrame) {
 
-	//if p.multiplexer != nil && p.multiplexer.mediaframeListener != nil {
-	//	buffer := C.GoBytes(unsafe.Pointer(frame.GetData()), C.int(frame.GetLength()))
-	//	if frame.GetType() == native.MediaFrameVideo {
-	//		data, err := annexbConvert(buffer)
-	//		if err == nil {
-	//			p.multiplexer.mediaframeListener(data, frame.GetTimeStamp())
-	//		} else {
-	//			fmt.Println(err)
-	//		}
-	//	} else {
-	//		p.multiplexer.mediaframeListener(buffer, frame.GetTimeStamp())
-	//	}
-	//
-	//}
+	if p.multiplexer != nil && p.multiplexer.mediaframeListener != nil {
+		buffer := C.GoBytes(unsafe.Pointer(frame.GetData()), C.int(frame.GetLength()))
+		if frame.GetType() == native.MediaFrameVideo {
+			data, err := annexbConvert(buffer)
+			if err == nil {
+				p.multiplexer.mediaframeListener(data, frame.GetTimeStamp())
+			} else {
+				fmt.Println(err)
+			}
+		} else {
+			p.multiplexer.mediaframeListener(buffer, frame.GetTimeStamp())
+		}
+	
+	}
 }
 
 // NewMediaStreamDuplicater duplicate this IncomingStreamTrack and callback the mediaframe
